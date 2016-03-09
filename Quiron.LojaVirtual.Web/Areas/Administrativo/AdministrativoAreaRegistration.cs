@@ -17,10 +17,8 @@ namespace Quiron.LojaVirtual.Web.Areas.Administrativo
             context.MapRoute(
                 "Administrativo_default",
                 "Administrativo/{controller}/{action}/{id}",
-                new { Controller="Produto", action = "Index", id = UrlParameter.Optional },
-                //serve para diferenciar os namespace, se NÂO colocar dessa forma,
-                //posso ter problema com o mesmo no de controller por ex do projeto principal
-                new [] { "Quiron.LojaVirtual.Web.Areas.Administrativo.Controllers" }
+                new { controller= "Produto", action = "Index", id = UrlParameter.Optional },
+                new[] { "Quiron.LojaVirtual.Web.Areas.Administrativo.Controllers" }
             );
         }
     }

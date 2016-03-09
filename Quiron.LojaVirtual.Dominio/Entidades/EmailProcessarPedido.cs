@@ -4,21 +4,24 @@ using System.Linq;
 using System.Net;
 using System.Net.Mail;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Quiron.LojaVirtual.Dominio.Entidades
 {
-    public class EmailProcessarPedido
+    public class EmailPedido
     {
         private readonly EmailConfiguracoes _emailConfiguracoes;
 
-        public EmailProcessarPedido(EmailConfiguracoes emailConfiguracoes)
+        public EmailPedido(EmailConfiguracoes emailConfiguracoes)
         {
             _emailConfiguracoes = emailConfiguracoes;
         }
 
+
         public void ProcessarPedido(Carrinho carrinho, Pedido pedido)
         {
+
             using (var smtpClient = new SmtpClient())
             {
                 smtpClient.EnableSsl = _emailConfiguracoes.UsarSsl;
@@ -26,7 +29,8 @@ namespace Quiron.LojaVirtual.Dominio.Entidades
                 smtpClient.Port = _emailConfiguracoes.ServidorPorta;
                 smtpClient.UseDefaultCredentials = false;
                 smtpClient.Credentials = new NetworkCredential(
-                    _emailConfiguracoes.Usuario, _emailConfiguracoes.ServidorSmtp);
+                    _emailConfiguracoes.Usuario, _emailConfiguracoes.ServidorSmtp
+                    );
 
                 if (_emailConfiguracoes.EscreverArquivo)
                 {
@@ -36,32 +40,33 @@ namespace Quiron.LojaVirtual.Dominio.Entidades
                 }
 
                 StringBuilder body = new StringBuilder()
-                    .Append("Novo Pedido")
-                    .Append("---------")
-                    .Append("Itens");
+                    .AppendLine("Novo Pedido:")
+                    .AppendLine("-------")
+                    .AppendLine("Itens");
 
-                foreach (var item in carrinho.ItensCarrinhos)
+                foreach (var item in carrinho.ItensCarrinho)
                 {
-                    var subTotal = item.Produto.Preco*item.Quantidade;
-                    body.AppendFormat("{0} x {1}(SubTotal: {2:c}",
-                        item.Quantidade, item.Produto.Nome, subTotal);
+                    var subtotal = item.Produto.Preco * item.Quantidade;
+                    body.AppendFormat("{0} x {1} (subtotal: {2:c}",
+                        item.Quantidade, item.Produto.Nome, subtotal);
                 }
 
-                body.AppendFormat("Valor Total do Pedido: {0}", carrinho.ObterValorTotal())
-                    .AppendLine("------------------")
+                body.AppendFormat("Valor total do peido: {0:c}", carrinho.ObterValorTotal())
+                    .AppendLine("--------------------")
+                    .AppendLine("Enviar para:")
                     .AppendLine(pedido.NomeCliente)
                     .AppendLine(pedido.Email)
                     .AppendLine(pedido.Endereco ?? "")
                     .AppendLine(pedido.Cidade ?? "")
                     .AppendLine(pedido.Complemento ?? "")
-                    .AppendLine("------------------")
-                    .AppendFormat("Para presente?{0}", pedido.EmbrulhaPresente ? "Sim" : "Não");
+                    .AppendLine("--------------------")
+                    .AppendFormat("Para presente?: {0}", pedido.EmbrulhaPresente ? "Sim" : "Não");
 
                 MailMessage mailMessage = new MailMessage(
                     _emailConfiguracoes.De,
                     _emailConfiguracoes.Para,
-                    "Novo Pedido",
-                    body.ToString());
+                    "Novo peido", body.ToString());
+
 
                 if (_emailConfiguracoes.EscreverArquivo)
                 {
@@ -69,6 +74,7 @@ namespace Quiron.LojaVirtual.Dominio.Entidades
                 }
 
                 smtpClient.Send(mailMessage);
+
             }
         }
     }

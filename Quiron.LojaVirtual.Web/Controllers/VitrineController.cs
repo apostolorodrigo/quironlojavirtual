@@ -28,6 +28,7 @@ namespace Quiron.LojaVirtual.Web.Controllers
                     .Take(ProdutosPorPagina),
 
 
+
                 Paginacao = new Paginacao
                 {
                     PaginaAtual = pagina,

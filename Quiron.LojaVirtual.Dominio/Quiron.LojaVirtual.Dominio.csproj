@@ -56,6 +56,9 @@
     <Compile Include="Repositorio\ProdutosRepositorio.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="dbo.Produtos.sql" />
+  </ItemGroup>
+  <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
